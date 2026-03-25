@@ -1,7 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 # H100 Baseline Execution (Int4 + Bayesian Cache)
-# Commit: 6b44bc6
+# -----------------------------------------------------------------------------
+# Traceability: Resolve current commit at runtime
+if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    export GIT_COMMIT=$(git rev-parse --short HEAD)
+    echo "H100 Execution Start | Commit: $GIT_COMMIT"
+else
+    echo "H100 Execution Start | (Not in a Git repo)"
+fi
+# -----------------------------------------------------------------------------
 
 # Hyperparameters can be overridden here or via env vars
 export RUN_ID=${RUN_ID:-main_cache_lzma_baseline}
