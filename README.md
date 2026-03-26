@@ -14,6 +14,15 @@ Ideally, we'd allow for submissions to use arbitrary computational resources. Bu
 We also know compute is expensive, so **OpenAI is sponsoring $1,000,000 in compute credits** to help people get started training their models. To request a compute grant, use this form: [Request a Compute Grant](https://openai.com/index/parameter-golf/#credit-form).
 When requesting compute, please make sure you choose the appropriate level, write sufficient justification, and **submit with an email tied to a OpenAI / ChatGPT account**.
 
+## Core Engineering Innovations
+
+This repository implements a hybrid-precision architecture optimized for maximum weight fidelity under the 16MB constraint:
+
+- **Int6 GPS (General Purpose Slots/Attention)**: Uses 6-bit quantization for key/query/value projections to maintain high sensitivity in the attention mechanism.
+- **Int4 Engine (MLP Feedforward)**: Employs aggressive 4-bit compression for the parameter-dense MLP blocks, which comprise the bulk of the model’s footprint.
+- **Dynamic Per-Block Scaling**: Implements adaptive normalization across 128-element weight blocks to handle outlier channels, ensuring stable convergence within the 10-minute training budget.
+- **Bayesian Backoff Cache**: An experimental inference-time refinement that leverages historical token transitions to bias prediction probabilities, effectively "recapturing" bits lost during static quantization.
+
 ## Participant Form
 
 If you enjoy solving very difficult technical problems, please introduce yourself via the [Challenge Participant Form](https://jobs.ashbyhq.com/openai/form/open-ai-challenge-parameter-golf). It helps us attribute challenge submissions and reach out about opportunities with OpenAI. _Completing the form is not required to participate._
@@ -50,6 +59,13 @@ Happy training!
 | Run | Score | Author | Summary | Date | Info |
 |-----|------:|--------|---------|------|------|
 | 4-Hour Baseline | 1.2074 | Will DePue | Testing unlimited compute, 4 hours on 8xH100 | 2026-03-18 | [info](records/track_non_record_16mb/2026-03-18_Quasi10Bfrom50B_SP1024_9x512_KV4_4h_pgut3/README.md) |
+
+## Experimental Research & Probes
+
+Detailed technical experiments and research artifacts are now maintained in separate dedicated repositories to ensure the canonical submission remains baseline-focused:
+
+- [TurboQuant MSE Probe](https://github.com/jmoncayo-pursuit/turboquant-mse-probe): Validating rotational quantization efficiency.
+- [Frontier Evaluation Adaptation](https://github.com/jmoncayo-pursuit/frontier-eval-adaptation): Research on evaluation-side predictive accuracy.
 
 ## Getting Started
 
