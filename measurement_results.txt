@@ -1,0 +1,77 @@
+Generating synthetic MLP weights (orthogonal init, 10 layers)
+  model_dim=512, hidden=2048
+
+================================================================================
+TURBOQUANT MSE MEASUREMENT PROBE
+================================================================================
+Model dimension: 512
+Target bit-width: 4
+Number of MLP tensors: 20
+Total MLP parameters: 20,971,520
+
+--- Rotation Matrix ---
+Generated 512×512 rotation matrix in 13.4ms
+Orthogonality error: 9.54e-07
+Rotation matrix storage:
+  Uncompressed (float16): 524,288 bytes (512.0 KB)
+  lzma compressed:        471,764 bytes (460.7 KB)
+
+--- Lloyd-Max Centroids (16 levels, for N(0, 1/512)) ---
+  Centroids: ['-0.120745', '-0.091416', '-0.071485', '-0.055496', '-0.041627', '-0.029010', '-0.017140', '-0.005671', '0.005671', '0.017140', '0.029010', '0.041627', '0.055496', '0.071485', '0.091416', '0.120745']
+
+--- Per-Tensor MSE Comparison (3 methods) ---
+Tensor                                   Shape               Baseline  TQ-Centroid    TQ-Hybrid         Best
+---------------------------------------------------------------------------------------------------------
+blocks.0.mlp.fc.weight                   [2048, 512]     0.0000067224 0.0000461345 0.0000164253     Baseline
+blocks.0.mlp.proj.weight                 [512, 2048]     0.0000003381 0.0000002315 0.0000003365  TQ-Centroid
+blocks.1.mlp.fc.weight                   [2048, 512]     0.0000066738 0.0000045938 0.0000066827  TQ-Centroid
+blocks.1.mlp.proj.weight                 [512, 2048]     0.0000003341 0.0000002298 0.0000003350  TQ-Centroid
+blocks.2.mlp.fc.weight                   [2048, 512]     0.0000067162 0.0000046056 0.0000066942  TQ-Centroid
+blocks.2.mlp.proj.weight                 [512, 2048]     0.0000003354 0.0000002306 0.0000003357  TQ-Centroid
+blocks.3.mlp.fc.weight                   [2048, 512]     0.0000067242 0.0000046217 0.0000067253  TQ-Centroid
+blocks.3.mlp.proj.weight                 [512, 2048]     0.0000003336 0.0000002301 0.0000003344  TQ-Centroid
+blocks.4.mlp.fc.weight                   [2048, 512]     0.0000067323 0.0000046139 0.0000067013  TQ-Centroid
+blocks.4.mlp.proj.weight                 [512, 2048]     0.0000003346 0.0000002311 0.0000003367  TQ-Centroid
+blocks.5.mlp.fc.weight                   [2048, 512]     0.0000066883 0.0000046102 0.0000067093  TQ-Centroid
+blocks.5.mlp.proj.weight                 [512, 2048]     0.0000003348 0.0000002311 0.0000003353  TQ-Centroid
+blocks.6.mlp.fc.weight                   [2048, 512]     0.0000067123 0.0000046130 0.0000067152  TQ-Centroid
+blocks.6.mlp.proj.weight                 [512, 2048]     0.0000003351 0.0000002316 0.0000003371  TQ-Centroid
+blocks.7.mlp.fc.weight                   [2048, 512]     0.0000067320 0.0000046263 0.0000067178  TQ-Centroid
+blocks.7.mlp.proj.weight                 [512, 2048]     0.0000003330 0.0000002317 0.0000003354  TQ-Centroid
+blocks.8.mlp.fc.weight                   [2048, 512]     0.0000067099 0.0000046089 0.0000067019  TQ-Centroid
+blocks.8.mlp.proj.weight                 [512, 2048]     0.0000003349 0.0000002299 0.0000003350  TQ-Centroid
+blocks.9.mlp.fc.weight                   [2048, 512]     0.0000066943 0.0000046192 0.0000067339  TQ-Centroid
+blocks.9.mlp.proj.weight                 [512, 2048]     0.0000003363 0.0000002312 0.0000003356  TQ-Centroid
+
+================================================================================
+AGGREGATE RESULTS
+================================================================================
+Total MLP elements:          20,971,520
+Baseline avg MSE:            0.0000035228
+TQ-Centroid avg MSE:         0.0000044978  (1.2768x baseline)
+TQ-Hybrid avg MSE:           0.0000040082  (1.1378x baseline)
+
+Tensor wins — Baseline: 1, TQ-Centroid: 19, TQ-Hybrid: 0
+
+--- Artifact Size Impact ---
+Rotation matrix overhead (lzma): 471,764 bytes
+16MB budget:                     16,000,000 bytes
+Overhead as % of budget:         2.95%
+
+--- Dimension Suitability Check (d=512) ---
+Expected coordinate variance (1/d): 0.001953
+Observed coordinate variance:       0.001953
+Variance ratio (observed/expected):  1.0000
+Correlation between coords 0 and 1: -0.055187
+
+================================================================================
+GO / NO-GO ASSESSMENT
+================================================================================
+  ✅ Rotation matrix overhead acceptable: 471,764 bytes
+  ✅ Coordinate distribution matches N(0,1/d) well at d=512
+  ❌ MSE regression: best TQ method (TQ-Hybrid) is 13.8% worse than baseline
+
+VERDICT: CONDITIONAL — 1 concern(s) need resolution before Stage 1
+
+CAVEAT: These measurements use synthetic weights.
+         Final go/no-go requires trained checkpoint + H100 val_bpb measurement.
