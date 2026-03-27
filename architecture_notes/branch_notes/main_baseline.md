@@ -26,7 +26,6 @@
 
 ## Measurements
 - **No hardware benchmarks available.**
-- **External Measurement (Reported):** `Post-EMA = 1.1193, 13.8MB` (Reported; not a local artifact; not verified by any local Runpod log).
 
 ## Risks / Open Questions
 - **Hardware Failure:** It is not yet verified if the script will run without OOM or compatibility errors on challenge-grade H100s.
