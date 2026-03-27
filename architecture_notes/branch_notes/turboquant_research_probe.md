@@ -3,7 +3,7 @@
 ## Purpose
 - Isolated research branch for testing whether TurboQuant-style rotation and centroid quantization are worth adapting to Parameter Golf.
 - Exists to answer a feasibility question before any invasive repo-side implementation work is started.
-- Derived from the planning memo at [turboquant_research_memo.md.resolved](/Users/jmoncayopursuit.org/.gemini/antigravity/brain/1cf0e198-d0e0-43e8-aa33-a4e3ccbed7e0/turboquant_research_memo.md.resolved).
+- Derived from an internal planning memo; this note keeps only the branch-relevant feasibility summary.
 
 ## Verified Now
 - The branch contains `turboquant_mse_probe.py`.
