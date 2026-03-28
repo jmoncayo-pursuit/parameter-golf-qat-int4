@@ -1,0 +1,10 @@
+---
+description: Colab runbook notebooks must not be pushed without explicit user approval
+alwaysApply: true
+---
+
+# Colab runbooks and GitHub
+
+Do not `git push` Colab runbook notebooks (e.g. `colab_*.ipynb` or other `.ipynb` protocol/runbooks) to GitHub unless the user has **explicitly** asked to publish or push them in the current task.
+
+Local edits and commits that stay unpushed are fine unless the user asks otherwise.
