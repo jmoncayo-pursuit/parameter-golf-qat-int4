@@ -17,7 +17,7 @@ Experimental line for **evaluation-time** predictive gains, **not** a new traini
 ### 2. `TestTimeAdapter` (T3)
 
 - Tiny **zero-initialized** eval-only adapter (e.g. bias keyed by hashed bigrams).
-- **After** a token is scored, the branch may **update** the adapter from that **already-graded** token (online steps, e.g. `AdamW`), still without writing a new main checkpoint.
+- **After** a token is scored, the branch may **update** the adapter from that **already-graded** token (online steps, e.g. `AdamW`), still without writing a new serialized checkpoint.
 - **Goal:** measure whether test-time adaptation improves prediction **beyond cache-only** mixing.
 
 ## Risks to measure
