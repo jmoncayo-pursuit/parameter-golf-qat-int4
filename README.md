@@ -62,6 +62,8 @@ Happy training!
 
 ## Experimental Research & Probes
 
+Candidate stack notes for this fork: **`architecture_notes/branch_notes/int6-gps-int4-mlp-baseline.md`** (git branch **`int6-gps-int4-mlp`** — Int6 GPS + Int4 MLP line).
+
 Detailed technical experiments and research artifacts are now maintained in separate dedicated repositories to ensure the canonical submission remains baseline-focused:
 
 - [TurboQuant MSE Probe](https://github.com/jmoncayo-pursuit/turboquant-mse-probe): Validating rotational quantization efficiency.
