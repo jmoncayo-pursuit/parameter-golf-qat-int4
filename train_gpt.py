@@ -768,8 +768,8 @@ class BayesianBackoffCache:
     """
     Backward-looking variable-order n-gram cache for eval-time mixing (no artifact change).
     Accumulates statistics from already-graded tokens during sliding window evaluation.
-    Candidate branch `qat-int4-int6-gps-mlp`; optional TestTimeAdapter (T3) on branch
-    `qat-int4-int6-gps-mlp-tt-adapter` — see architecture_notes. Uses only graded tokens per README eval rules.
+    Part of the `qat-int4-int6-gps-mlp-tt-adapter` experimental line; pairs with optional
+    TestTimeAdapter (T3) — see architecture_notes/branch_notes/BayesianBackoffCache-TTAdapter.md.
     """
     def __init__(self, vocab_size: int, max_order: int = 5, recency_decay: float = 0.999,
                  min_cache_count: float = 0.1, entropy_threshold: float = 0.2,
@@ -967,10 +967,9 @@ def eval_val_sliding_cached(
     batch_seqs: int = 32,
 ) -> tuple[float, float]:
     """
-    Sliding eval: BayesianBackoffCache mixes model logits when thresholds pass; uses only
-    already-graded tokens for cache stats. TestTimeAdapter (T3) adds zero-init bigram bias
-    updated online on graded tokens — branch `qat-int4-int6-gps-mlp-tt-adapter`;
-    see architecture_notes/branch_notes/qat-int4-int6-gps-mlp-tt-adapter.md.
+    Sliding eval: BayesianBackoffCache mixes model logits when thresholds pass; optional
+    TestTimeAdapter (T3) adds zero-init bigram bias updated online on graded tokens only.
+    See architecture_notes/branch_notes/BayesianBackoffCache-TTAdapter.md.
     """
     cache = BayesianBackoffCache(vocab_size=args.vocab_size)
     adapter = TestTimeAdapter(args.vocab_size).to(device)
@@ -1058,7 +1057,7 @@ def eval_val_sliding_cached(
                 else 0.0
             )
             print(
-                f"  qat_int4_int6_gps_mlp_tt_eval [{pct:5.1f}%] {done}/{len(my_windows)} windows running_bpb={running_bpb:.6f}",
+                f"  BayesianBackoffCache-TTAdapter [{pct:5.1f}%] {done}/{len(my_windows)} windows running_bpb={running_bpb:.6f}",
                 flush=True,
             )
 

@@ -62,12 +62,14 @@ Happy training!
 
 ## Experimental Research & Probes
 
-Candidate stack notes for this fork: **`architecture_notes/branch_notes/qat-int4-int6-gps-mlp-baseline.md`** (default git branch **`qat-int4-int6-gps-mlp`**).
+**This fork:** [`jmoncayo-pursuit/parameter-golf-qat-int4`](https://github.com/jmoncayo-pursuit/parameter-golf-qat-int4). Default branch **`qat-int4-int6-gps-mlp`** — candidate stack: **`architecture_notes/branch_notes/qat-int4-int6-gps-mlp-baseline.md`**.
 
-Detailed technical experiments and research artifacts are now maintained in separate dedicated repositories to ensure the canonical submission remains baseline-focused:
+**Distinct experiments** are **branches off that line** (same repository, not separate canonical homes):
 
-- [TurboQuant MSE Probe](https://github.com/jmoncayo-pursuit/turboquant-mse-probe): Validating rotational quantization efficiency.
-- **Eval-time cache + T3** (same repo [`parameter-golf-qat-int4`](https://github.com/jmoncayo-pursuit/parameter-golf-qat-int4), branch **`qat-int4-int6-gps-mlp-tt-adapter`**): **`BayesianBackoffCache`** + optional **`TestTimeAdapter`** — `architecture_notes/branch_notes/qat-int4-int6-gps-mlp-tt-adapter.md`. **Baseline** training/eval: **`run_qat_int4_int6_gps_mlp_baseline.sh`**. **TT-adapter branch** also includes **`run_qat_int4_int6_gps_mlp_tt_adapter.sh`**.
+- **TurboQuant MSE probe** — branch **`research/turboquant-probe`**, doc **`architecture_notes/branch_notes/research-turboquant-probe.md`**: rotational / centroid quantization probes (`turboquant_mse_probe.py`), feasibility before touching `train_gpt.py` export paths.
+- **BayesianBackoffCache + TTAdapter** — branch **`qat-int4-int6-gps-mlp-tt-adapter`**, note **`architecture_notes/branch_notes/BayesianBackoffCache-TTAdapter.md`**: eval-time `val_bpb` with backward-looking cache plus optional online **`TestTimeAdapter` (T3)** without changing the serialized artifact.
+
+A separate clone [`turboquant-mse-probe`](https://github.com/jmoncayo-pursuit/turboquant-mse-probe) may exist for snapshots or mirrors; **canonical experiment tracking for this fork is the branches above.**
 
 ## Getting Started
 
