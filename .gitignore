@@ -10,3 +10,6 @@ data/docs_selected.jsonl
 .venv
 logs/
 colab_*.ipynb
+!colab_bayesian_backoff_cache_tt_adapter_launcher.ipynb
+!colab_int6_gps_int4_mlp_train.ipynb
+!colab_turboquant_mse_surrogate_quant_probe.ipynb
