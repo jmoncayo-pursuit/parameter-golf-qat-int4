@@ -62,7 +62,7 @@ Happy training!
 
 ## Experimental Research & Probes
 
-Candidate stack notes for this fork: **`architecture_notes/branch_notes/int6-gps-int4-mlp-baseline.md`** (git branch **`int6-gps-int4-mlp`** — Int6 GPS + Int4 MLP line).
+Candidate stack notes for this fork: **`architecture_notes/branch_notes/qat-int4-int6-gps-mlp-baseline.md`** (default git branch **`qat-int4-int6-gps-mlp`**).
 
 Detailed technical experiments and research artifacts are now maintained in separate dedicated repositories to ensure the canonical submission remains baseline-focused:
 

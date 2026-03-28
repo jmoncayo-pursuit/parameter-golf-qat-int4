@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-# H100 baseline — Int6 GPS + Int4 MLP candidate (git branch int6-gps-int4-mlp); Int4 MLP + Bayesian cache eval path
+# H100 baseline — QAT Int4 MLP + Int6 GPS attention (git branch qat-int4-int6-gps-mlp); Bayesian cache eval path
 # -----------------------------------------------------------------------------
 # Traceability: Resolve current commit at runtime
 if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
