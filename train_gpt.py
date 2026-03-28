@@ -768,8 +768,8 @@ class BayesianBackoffCache:
     """
     Backward-looking variable-order n-gram cache for eval-time mixing (no artifact change).
     Accumulates statistics from already-graded tokens during sliding window evaluation.
-    Part of the `qat-int4-int6-gps-mlp-tt-adapter` experimental line; pairs with optional
-    TestTimeAdapter (T3) — see architecture_notes/branch_notes/BayesianBackoffCache-TTAdapter.md.
+    Part of the `bayesian-backoff-cache-tt-adapter` experimental line; pairs with optional
+    TestTimeAdapter (T3) — see architecture_notes/branch_notes/bayesian-backoff-cache-tt-adapter.md.
     """
     def __init__(self, vocab_size: int, max_order: int = 5, recency_decay: float = 0.999,
                  min_cache_count: float = 0.1, entropy_threshold: float = 0.2,
@@ -969,7 +969,7 @@ def eval_val_sliding_cached(
     """
     Sliding eval: BayesianBackoffCache mixes model logits when thresholds pass; optional
     TestTimeAdapter (T3) adds zero-init bigram bias updated online on graded tokens only.
-    See architecture_notes/branch_notes/BayesianBackoffCache-TTAdapter.md.
+    See architecture_notes/branch_notes/bayesian-backoff-cache-tt-adapter.md.
     """
     cache = BayesianBackoffCache(vocab_size=args.vocab_size)
     adapter = TestTimeAdapter(args.vocab_size).to(device)

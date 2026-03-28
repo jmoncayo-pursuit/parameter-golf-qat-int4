@@ -14,7 +14,7 @@ Git branch: **`qat-int4-int6-gps-mlp`** — quantization-aware training, Int4 ML
   - QAT clip ranges that map to the current mixed-precision design: Int4 MLP weights and Int6 attention/bigram weights.
   - `mixed_quantize_int6()` / `dequantize_mixed_int6()` export roundtrip and `final_model.mixed.ptz` artifact path.
   - SWA application plus 3% magnitude pruning before serialization.
-  - `BayesianBackoffCache` inside `eval_val_sliding_cached()` for evaluation-side mixing (see [BayesianBackoffCache-TTAdapter.md](./BayesianBackoffCache-TTAdapter.md) for branch **`qat-int4-int6-gps-mlp-tt-adapter`**: cache + **TestTimeAdapter**).
+  - `BayesianBackoffCache` inside `eval_val_sliding_cached()` for evaluation-side mixing (see [bayesian-backoff-cache-tt-adapter.md](./bayesian-backoff-cache-tt-adapter.md) for branch **`bayesian-backoff-cache-tt-adapter`**: cache + **TestTimeAdapter**).
 - No local Runpod/H100 artifact or benchmark log is committed for this branch.
 
 ## Feasibility Summary

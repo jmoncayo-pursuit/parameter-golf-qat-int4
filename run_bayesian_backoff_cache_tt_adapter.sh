@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-# Branch qat-int4-int6-gps-mlp-tt-adapter — BayesianBackoffCache + TestTimeAdapter (T3)
+# Branch bayesian-backoff-cache-tt-adapter — BayesianBackoffCache + TestTimeAdapter (T3)
 # -----------------------------------------------------------------------------
 if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     export GIT_COMMIT=$(git rev-parse --short HEAD)
@@ -10,7 +10,7 @@ else
 fi
 # -----------------------------------------------------------------------------
 
-export RUN_ID=${RUN_ID:-BayesianBackoffCache_TTAdapter}
+export RUN_ID=${RUN_ID:-bayesian_backoff_cache_tt_adapter}
 export EVAL_CACHE=${EVAL_CACHE:-1}
 export COMPRESSOR=${COMPRESSOR:-lzma}
 export VAL_LOSS_EVERY=${VAL_LOSS_EVERY:-0}

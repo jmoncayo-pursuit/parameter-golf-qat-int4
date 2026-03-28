@@ -67,7 +67,7 @@ Happy training!
 **Distinct experiments** are **branches off that line** (same repository, not separate canonical homes):
 
 - **TurboQuant MSE probe** — branch **`research/turboquant-probe`**, doc **`architecture_notes/branch_notes/research-turboquant-probe.md`**: rotational / centroid quantization probes (`turboquant_mse_probe.py`), feasibility before touching `train_gpt.py` export paths.
-- **BayesianBackoffCache + TTAdapter** — branch **`qat-int4-int6-gps-mlp-tt-adapter`**, note **`architecture_notes/branch_notes/BayesianBackoffCache-TTAdapter.md`**: eval-time `val_bpb` with backward-looking cache plus optional online **`TestTimeAdapter` (T3)** without changing the serialized artifact.
+- **BayesianBackoffCache + TTAdapter** — branch **`bayesian-backoff-cache-tt-adapter`**, note **`architecture_notes/branch_notes/bayesian-backoff-cache-tt-adapter.md`**: eval-time `val_bpb` with backward-looking cache plus optional online **`TestTimeAdapter` (T3)** without changing the serialized artifact.
 
 A separate clone [`turboquant-mse-probe`](https://github.com/jmoncayo-pursuit/turboquant-mse-probe) may exist for snapshots or mirrors; **canonical experiment tracking for this fork is the branches above.**
 

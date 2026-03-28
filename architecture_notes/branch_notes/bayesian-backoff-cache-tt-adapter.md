@@ -1,14 +1,14 @@
-# BayesianBackoffCache-TTAdapter
+# bayesian-backoff-cache-tt-adapter
 
 ## Naming (read this first)
 
 | Where | Name |
 |-------|------|
-| **Git branch** | `qat-int4-int6-gps-mlp-tt-adapter` |
-| **This note filename / descriptive label** | `BayesianBackoffCache-TTAdapter` |
-| **Optional `RUN_ID` / log label shorthand** | `BayesianBackoffCache_TTAdapter` |
+| **Git branch** | `bayesian-backoff-cache-tt-adapter` |
+| **This note filename** | `bayesian-backoff-cache-tt-adapter.md` |
+| **Optional `RUN_ID` / log label shorthand** | `bayesian_backoff_cache_tt_adapter` |
 
-Upstream repo URL stays **`jmoncayo-pursuit/parameter-golf-qat-int4`**; the current experiment branch is **`qat-int4-int6-gps-mlp-tt-adapter`**.
+Upstream repo URL stays **`jmoncayo-pursuit/parameter-golf-qat-int4`**; the current experiment branch is **`bayesian-backoff-cache-tt-adapter`**.
 
 ## Purpose
 
@@ -59,15 +59,15 @@ Experimental line for **evaluation-time** predictive gains, **not** a new traini
 On **target-like hardware**:
 
 1. **`qat-int4-int6-gps-mlp` (candidate):** cache-only path — `eval_val_sliding_cached()` with **`BayesianBackoffCache`** and **no `TestTimeAdapter`**.
-2. **`qat-int4-int6-gps-mlp-tt-adapter`:** same checkpoint, same token slice, **cache + `TestTimeAdapter`** enabled.
+2. **`bayesian-backoff-cache-tt-adapter`:** same checkpoint, same token slice, **cache + `TestTimeAdapter`** enabled.
 
 Log **both** `val_bpb` and **wall-clock** so the line is judged on evidence, not theory.
 
 ## Related files (this repository)
 
-- `train_gpt.py`: `BayesianBackoffCache` and `eval_val_sliding_cached()` on **`qat-int4-int6-gps-mlp`**. Branch **`qat-int4-int6-gps-mlp-tt-adapter`** adds `TestTimeAdapter` and T3 updates in that eval loop.
-- `run_BayesianBackoffCache_TTAdapter.sh`: optional H100 entrypoint for the **`qat-int4-int6-gps-mlp-tt-adapter`** branch; compare with `run_qat_int4_int6_gps_mlp_baseline.sh` on **`qat-int4-int6-gps-mlp`** for cache-only.
+- `train_gpt.py`: `BayesianBackoffCache` and `eval_val_sliding_cached()` on **`qat-int4-int6-gps-mlp`**. Branch **`bayesian-backoff-cache-tt-adapter`** adds `TestTimeAdapter` and T3 updates in that eval loop.
+- `run_bayesian_backoff_cache_tt_adapter.sh`: optional H100 entrypoint for the **`bayesian-backoff-cache-tt-adapter`** branch; compare with `run_qat_int4_int6_gps_mlp_baseline.sh` on **`qat-int4-int6-gps-mlp`** for cache-only.
 
 ## Legacy naming
 
-Any **`frontier-eval-adaptation`** name is historical only.
+Any **`frontier-eval-adaptation`** or **`qat-int4-int6-gps-mlp-tt-adapter`** name is historical only.
