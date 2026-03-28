@@ -766,9 +766,10 @@ class GPT(nn.Module):
 
 class BayesianBackoffCache:
     """
-    Experimental variable-order n-gram cache for eval-time prediction improvement.
+    Backward-looking variable-order n-gram cache for eval-time mixing (no artifact change).
     Accumulates statistics from already-graded tokens during sliding window evaluation.
-    Designed for experimentation within README Line 163 constraints.
+    Part of the BayesianBackoffCache_TTAdapter experimental line; pairs with optional
+    TestTimeAdapter (T3) on branch BayesianBackoffCache_TTAdapter — see architecture_notes.
     """
     def __init__(self, vocab_size: int, max_order: int = 5, recency_decay: float = 0.999,
                  min_cache_count: float = 0.1, entropy_threshold: float = 0.2,
@@ -938,8 +939,9 @@ def eval_val_sliding_cached(
     batch_seqs: int = 32,
 ) -> tuple[float, float]:
     """
-    Experimental cached evaluation using an Online Bayesian Backoff Cache.
-    Incorporates Phase 2 - Bayesian Backoff Cache.
+    Sliding eval with BayesianBackoffCache: mix model logits with cache when thresholds pass.
+    Uses only already-graded tokens for cache stats. Extended line adds TestTimeAdapter (T3)
+    on branch BayesianBackoffCache_TTAdapter — see architecture_notes/branch_notes/.
     """
     cache = BayesianBackoffCache(vocab_size=args.vocab_size)
     seq_len = args.train_seq_len

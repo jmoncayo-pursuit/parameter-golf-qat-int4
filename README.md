@@ -65,7 +65,7 @@ Happy training!
 Detailed technical experiments and research artifacts are now maintained in separate dedicated repositories to ensure the canonical submission remains baseline-focused:
 
 - [TurboQuant MSE Probe](https://github.com/jmoncayo-pursuit/turboquant-mse-probe): Validating rotational quantization efficiency.
-- [Frontier Evaluation Adaptation](https://github.com/jmoncayo-pursuit/frontier-eval-adaptation): Research on evaluation-side predictive accuracy.
+- [BayesianBackoffCache + TTAdapter](https://github.com/jmoncayo-pursuit/BayesianBackoffCache_TTAdapter) (repo/branch name `BayesianBackoffCache_TTAdapter`): **Eval-time** `val_bpb` experiments — backward-looking n-gram cache plus optional online `TestTimeAdapter` (T3), **without** changing the serialized artifact — details in `architecture_notes/branch_notes/BayesianBackoffCache_TTAdapter.md`.
 
 ## Getting Started
 
