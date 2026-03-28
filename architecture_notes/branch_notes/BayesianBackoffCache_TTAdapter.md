@@ -6,6 +6,8 @@ Experimental line for **evaluation-time** predictive gains, **not** a new traini
 
 **Core question:** Can we improve `val_bpb` at evaluation time using only **already-seen / already-graded** validation tokens, **without** modifying the serialized model artifact?
 
+**Branch role:** this branch is the **combined** experiment. The stable candidate line can remain cache-only. This branch exists to answer the narrower question: does adding `TestTimeAdapter` on top of `BayesianBackoffCache` earn its extra runtime complexity?
+
 ## What it tests
 
 ### 1. `BayesianBackoffCache`
@@ -19,6 +21,15 @@ Experimental line for **evaluation-time** predictive gains, **not** a new traini
 - Tiny **zero-initialized** eval-only adapter (e.g. bias keyed by hashed bigrams).
 - **After** a token is scored, the branch may **update** the adapter from that **already-graded** token (online steps, e.g. `AdamW`), still without writing a new serialized checkpoint.
 - **Goal:** measure whether test-time adaptation improves prediction **beyond cache-only** mixing.
+
+## Why `TestTimeAdapter` lives here and not everywhere
+
+- `TestTimeAdapter` is **not** a universal component that every branch should carry.
+- Quantization or architecture branches do not need it because it would add a second moving part and muddy attribution.
+- The clean ablation is:
+  - **candidate branch:** `BayesianBackoffCache` only
+  - **this branch:** `BayesianBackoffCache` + `TestTimeAdapter`
+- That separation lets us answer the right question: is the adapter itself worth the added runtime and rule-compliance risk?
 
 ## Risks to measure
 
@@ -37,8 +48,8 @@ Experimental line for **evaluation-time** predictive gains, **not** a new traini
 
 On **target-like hardware**:
 
-1. **`qat-int4-int6-gps-mlp` (candidate):** cache-only path — `eval_val_sliding_cached()` with **`BayesianBackoffCache`**, adapter **disabled** if gated by flag.
-2. **`BayesianBackoffCache_TTAdapter`:** same checkpoint, **cache + `TestTimeAdapter`** enabled.
+1. **`qat-int4-int6-gps-mlp` (candidate):** cache-only path — `eval_val_sliding_cached()` with **`BayesianBackoffCache`** and **no `TestTimeAdapter`**.
+2. **`BayesianBackoffCache_TTAdapter`:** same checkpoint, same token slice, **cache + `TestTimeAdapter`** enabled.
 
 Log **both** `val_bpb` and **wall-clock** so the line is judged on evidence, not theory.
 
@@ -47,6 +58,7 @@ Log **both** `val_bpb` and **wall-clock** so the line is judged on evidence, not
 - `train_gpt.py`: `BayesianBackoffCache` and `eval_val_sliding_cached()` on **`qat-int4-int6-gps-mlp`**. Branch `BayesianBackoffCache_TTAdapter` adds `TestTimeAdapter` and T3 updates in that eval loop.
 - `run_bayesian_backoff_cache_tt_adapter.sh`: optional H100 entrypoint on this branch; compare with `run_baseline.sh` on **`qat-int4-int6-gps-mlp`** for cache-only.
 
-## GitHub
+## Naming note
 
-Rename the remote repository from any legacy name (e.g. `frontier-eval-adaptation`) to **`BayesianBackoffCache_TTAdapter`** so URLs match this note.
+- Local naming is now **`BayesianBackoffCache_TTAdapter`** because that is the actual mechanism pair under test.
+- Any legacy `frontier-eval-adaptation` naming should be treated as historical, not descriptive.
