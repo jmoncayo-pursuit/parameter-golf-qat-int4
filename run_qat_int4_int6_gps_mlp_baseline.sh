@@ -12,7 +12,7 @@ fi
 # -----------------------------------------------------------------------------
 
 # Hyperparameters can be overridden here or via env vars
-export RUN_ID=${RUN_ID:-main_cache_lzma_baseline}
+export RUN_ID=${RUN_ID:-qat_int4_int6_gps_mlp_cache_lzma_baseline}
 export EVAL_CACHE=${EVAL_CACHE:-1}
 export COMPRESSOR=${COMPRESSOR:-lzma}
 export VAL_LOSS_EVERY=${VAL_LOSS_EVERY:-0}

@@ -67,7 +67,7 @@ Candidate stack notes for this fork: **`architecture_notes/branch_notes/qat-int4
 Detailed technical experiments and research artifacts are now maintained in separate dedicated repositories to ensure the canonical submission remains baseline-focused:
 
 - [TurboQuant MSE Probe](https://github.com/jmoncayo-pursuit/turboquant-mse-probe): Validating rotational quantization efficiency.
-- [BayesianBackoffCache + TTAdapter](https://github.com/jmoncayo-pursuit/BayesianBackoffCache_TTAdapter) (repo/branch name `BayesianBackoffCache_TTAdapter`): **Eval-time** `val_bpb` experiments — backward-looking n-gram cache plus optional online `TestTimeAdapter` (T3), **without** changing the serialized artifact — details in `architecture_notes/branch_notes/BayesianBackoffCache_TTAdapter.md`.
+- **Eval-time cache + T3** (same repo [`parameter-golf-qat-int4`](https://github.com/jmoncayo-pursuit/parameter-golf-qat-int4), branch **`qat-int4-int6-gps-mlp-tt-adapter`**): **`BayesianBackoffCache`** + optional **`TestTimeAdapter`** — `architecture_notes/branch_notes/qat-int4-int6-gps-mlp-tt-adapter.md`. **Baseline** training/eval: **`run_qat_int4_int6_gps_mlp_baseline.sh`**. **TT-adapter branch** also includes **`run_qat_int4_int6_gps_mlp_tt_adapter.sh`**.
 
 ## Getting Started
 
