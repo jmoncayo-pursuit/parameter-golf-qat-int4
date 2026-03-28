@@ -1,4 +1,6 @@
-# Main Candidate Branch
+# Int6 GPS + Int4 MLP candidate
+
+Git branch: **`int6-gps-int4-mlp`** (Int6 attention / GPS-style slots + Int4 MLP stack).
 
 ## Purpose
 - Canonical candidate branch for the current Parameter Golf submission line.
