@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
-# BayesianBackoffCache + TestTimeAdapter (T3) — eval-time adaptation line
+# H100 baseline — QAT Int4 MLP + Int6 GPS attention (git branch qat-int4-int6-gps-mlp); Bayesian cache eval path
 # -----------------------------------------------------------------------------
+# Traceability: Resolve current commit at runtime
 if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     export GIT_COMMIT=$(git rev-parse --short HEAD)
     echo "H100 Execution Start | Commit: $GIT_COMMIT"
@@ -10,10 +11,12 @@ else
 fi
 # -----------------------------------------------------------------------------
 
-export RUN_ID=${RUN_ID:-bb_cache_tt_adapter}
+# Hyperparameters can be overridden here or via env vars
+export RUN_ID=${RUN_ID:-qat_int4_int6_gps_mlp_cache_lzma_baseline}
 export EVAL_CACHE=${EVAL_CACHE:-1}
 export COMPRESSOR=${COMPRESSOR:-lzma}
 export VAL_LOSS_EVERY=${VAL_LOSS_EVERY:-0}
 export MAX_WALLCLOCK_SECONDS=${MAX_WALLCLOCK_SECONDS:-600}
 
+# Execution via torchrun (Distributed Training + Evaluation)
 torchrun --standalone --nproc_per_node=8 train_gpt.py

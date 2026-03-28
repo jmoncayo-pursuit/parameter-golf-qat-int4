@@ -1,4 +1,6 @@
-# Branch / repo: `BayesianBackoffCache_TTAdapter`
+# Branch: `qat-int4-int6-gps-mlp-tt-adapter`
+
+**Repository:** same fork as the candidate line — [`parameter-golf-qat-int4`](https://github.com/jmoncayo-pursuit/parameter-golf-qat-int4) (not a separate product repo).
 
 ## Purpose
 
@@ -6,14 +8,14 @@ Experimental line for **evaluation-time** predictive gains, **not** a new traini
 
 **Core question:** Can we improve `val_bpb` at evaluation time using only **already-seen / already-graded** validation tokens, **without** modifying the serialized model artifact?
 
-**Branch role:** this branch is the **combined** experiment. The stable candidate line can remain cache-only. This branch exists to answer the narrower question: does adding `TestTimeAdapter` on top of `BayesianBackoffCache` earn its extra runtime complexity?
+**Branch role:** **combined** experiment on top of **`qat-int4-int6-gps-mlp`**. The candidate branch can stay cache-only; this branch tests whether **`TestTimeAdapter`** on top of **`BayesianBackoffCache`** is worth the extra eval cost.
 
 ## What it tests
 
 ### 1. `BayesianBackoffCache`
 
 - Backward-looking **variable-order n-gram** cache.
-- During **sliding** validation eval, uses **only already-graded** tokens to build cache statistics and, when thresholds pass, **mix** cache probabilities with model logits.
+- During sliding validation eval, uses **only already-graded** tokens to build cache statistics and, when thresholds pass, **mix** cache probabilities with model logits.
 - **Goal:** lower BPB without changing the saved checkpoint bytes.
 
 ### 2. `TestTimeAdapter` (T3)
@@ -27,9 +29,9 @@ Experimental line for **evaluation-time** predictive gains, **not** a new traini
 - `TestTimeAdapter` is **not** a universal component that every branch should carry.
 - Quantization or architecture branches do not need it because it would add a second moving part and muddy attribution.
 - The clean ablation is:
-  - **candidate branch:** `BayesianBackoffCache` only
+  - **candidate branch `qat-int4-int6-gps-mlp`:** `BayesianBackoffCache` only (no T3 in this eval path)
   - **this branch:** `BayesianBackoffCache` + `TestTimeAdapter`
-- That separation lets us answer the right question: is the adapter itself worth the added runtime and rule-compliance risk?
+- That separation answers whether the adapter is worth added runtime and rule-compliance risk.
 
 ## Risks to measure
 
@@ -49,16 +51,17 @@ Experimental line for **evaluation-time** predictive gains, **not** a new traini
 On **target-like hardware**:
 
 1. **`qat-int4-int6-gps-mlp` (candidate):** cache-only path — `eval_val_sliding_cached()` with **`BayesianBackoffCache`** and **no `TestTimeAdapter`**.
-2. **`BayesianBackoffCache_TTAdapter`:** same checkpoint, same token slice, **cache + `TestTimeAdapter`** enabled.
+2. **`qat-int4-int6-gps-mlp-tt-adapter`:** same checkpoint, same token slice, **cache + `TestTimeAdapter`** enabled.
 
 Log **both** `val_bpb` and **wall-clock** so the line is judged on evidence, not theory.
 
 ## Related files (this repository)
 
-- `train_gpt.py`: `BayesianBackoffCache` and `eval_val_sliding_cached()` on **`qat-int4-int6-gps-mlp`**. Branch `BayesianBackoffCache_TTAdapter` adds `TestTimeAdapter` and T3 updates in that eval loop.
-- `run_bayesian_backoff_cache_tt_adapter.sh`: optional H100 entrypoint on this branch; compare with `run_baseline.sh` on **`qat-int4-int6-gps-mlp`** for cache-only.
+- `train_gpt.py`: `BayesianBackoffCache` and `eval_val_sliding_cached()` on **`qat-int4-int6-gps-mlp`**. Branch **`qat-int4-int6-gps-mlp-tt-adapter`** adds `TestTimeAdapter` and T3 updates in that eval loop.
+- `run_qat_int4_int6_gps_mlp_tt_adapter.sh`: H100 entrypoint on this branch; compare with `run_qat_int4_int6_gps_mlp_baseline.sh` on **`qat-int4-int6-gps-mlp`** for cache-only.
 
-## Naming note
+## Naming
 
-- Local naming is now **`BayesianBackoffCache_TTAdapter`** because that is the actual mechanism pair under test.
-- Any legacy `frontier-eval-adaptation` naming should be treated as historical, not descriptive.
+- **Python types** stay `BayesianBackoffCache` and `TestTimeAdapter` (implementation names).
+- **Git branch** and **docs** use the `qat-int4-int6-gps-mlp*` prefix for consistency with the candidate stack.
+- Eval log tag: `qat_int4_int6_gps_mlp_tt_eval` (see `train_gpt.py`).
