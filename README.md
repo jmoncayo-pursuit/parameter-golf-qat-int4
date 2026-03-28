@@ -16,7 +16,7 @@ When requesting compute, please make sure you choose the appropriate level, writ
 
 ## You are on branch `noisy-qat-bayesian`
 
-This checkout is the **training-side noisy QAT + Bayesian-inspired quantization** line—not the eval-time cache/adapter stack, not the TurboQuant probe, and not automatically “all experiments at once.” Read the branch note: [`architecture_notes/branch_notes/noisy-qat-bayesian.md`](architecture_notes/branch_notes/noisy-qat-bayesian.md).
+This checkout is the **training-side noisy QAT + Bayesian-inspired quantization** line. Read the branch note: [`architecture_notes/branch_notes/noisy-qat-bayesian.md`](architecture_notes/branch_notes/noisy-qat-bayesian.md).
 
 **What is on this branch:** the shared fork tree and candidate training stack inherited from the **`qat-int4-int6-gps-mlp`** lineage (same repo, different branches carry different experiments).
 
