@@ -1,6 +1,6 @@
-# Int6 GPS + Int4 MLP candidate
+# QAT Int4 + Int6 GPS + MLP candidate
 
-Git branch: **`int6-gps-int4-mlp`** (Int6 attention / GPS-style slots + Int4 MLP stack).
+Git branch: **`qat-int4-int6-gps-mlp`** — quantization-aware training, Int4 MLP blocks, Int6 attention (GPS-style slots), mixed-precision export.
 
 ## Purpose
 - Canonical candidate branch for the current Parameter Golf submission line.

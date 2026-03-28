@@ -37,15 +37,15 @@ Experimental line for **evaluation-time** predictive gains, **not** a new traini
 
 On **target-like hardware**:
 
-1. **`int6-gps-int4-mlp` (candidate):** cache-only path — `eval_val_sliding_cached()` with **`BayesianBackoffCache`**, adapter **disabled** if gated by flag.
+1. **`qat-int4-int6-gps-mlp` (candidate):** cache-only path — `eval_val_sliding_cached()` with **`BayesianBackoffCache`**, adapter **disabled** if gated by flag.
 2. **`BayesianBackoffCache_TTAdapter`:** same checkpoint, **cache + `TestTimeAdapter`** enabled.
 
 Log **both** `val_bpb` and **wall-clock** so the line is judged on evidence, not theory.
 
 ## Related files (this repository)
 
-- `train_gpt.py`: `BayesianBackoffCache` and `eval_val_sliding_cached()` on **`int6-gps-int4-mlp`**. Branch `BayesianBackoffCache_TTAdapter` adds `TestTimeAdapter` and T3 updates in that eval loop.
-- `run_bayesian_backoff_cache_tt_adapter.sh`: optional H100 entrypoint on this branch; compare with `run_baseline.sh` on **`int6-gps-int4-mlp`** for cache-only.
+- `train_gpt.py`: `BayesianBackoffCache` and `eval_val_sliding_cached()` on **`qat-int4-int6-gps-mlp`**. Branch `BayesianBackoffCache_TTAdapter` adds `TestTimeAdapter` and T3 updates in that eval loop.
+- `run_bayesian_backoff_cache_tt_adapter.sh`: optional H100 entrypoint on this branch; compare with `run_baseline.sh` on **`qat-int4-int6-gps-mlp`** for cache-only.
 
 ## GitHub
 
