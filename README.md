@@ -20,8 +20,6 @@ This checkout is the **training-side noisy QAT + Bayesian-inspired quantization*
 
 **What is on this branch:** the shared fork tree and candidate training stack inherited from the **`qat-int4-int6-gps-mlp`** lineage (same repo, different branches carry different experiments).
 
-**What is *not* defined by this branch name alone:** leaderboard rows below are **challenge-wide** submissions in `records/` (many configs never ran on `noisy-qat-bayesian`). **`BayesianBackoffCache` / `TestTimeAdapter`** live on **`qat-int4-int6-gps-mlp-tt-adapter`**, not here.
-
 ## Core engineering (fork baseline vs other branches)
 
 The **default candidate stack** on branch **`qat-int4-int6-gps-mlp`** (and inherited files on this branch until diverging commits) centers on:
@@ -30,7 +28,7 @@ The **default candidate stack** on branch **`qat-int4-int6-gps-mlp`** (and inher
 - **Int4 MLP**: aggressive 4-bit-style compression on feedforward blocks.
 - **Dynamic per-block scaling**: normalization across weight blocks for stable low-bit export.
 
-**Eval-time line (different branch):** **`BayesianBackoffCache`** and optional **`TestTimeAdapter`** are developed on **`qat-int4-int6-gps-mlp-tt-adapter`**. Do not assume they are enabled or present on **`noisy-qat-bayesian`** unless you have merged that work.
+**Eval-time line (different branch):** **`BayesianBackoffCache`** and optional **`TestTimeAdapter`** are on **`qat-int4-int6-gps-mlp-tt-adapter`**.
 
 ## Participant Form
 
