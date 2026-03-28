@@ -14,21 +14,13 @@ Ideally, we'd allow for submissions to use arbitrary computational resources. Bu
 We also know compute is expensive, so **OpenAI is sponsoring $1,000,000 in compute credits** to help people get started training their models. To request a compute grant, use this form: [Request a Compute Grant](https://openai.com/index/parameter-golf/#credit-form).
 When requesting compute, please make sure you choose the appropriate level, write sufficient justification, and **submit with an email tied to a OpenAI / ChatGPT account**.
 
-## You are on branch `noisy-qat-bayesian`
+## Branch `noisy-qat-bayesian`
 
-This checkout is the **training-side noisy QAT + Bayesian-inspired quantization** line. Read the branch note: [`architecture_notes/branch_notes/noisy-qat-bayesian.md`](architecture_notes/branch_notes/noisy-qat-bayesian.md).
+**What we are doing:** training-side experiments so aggressive low-bit weights are less brittle—starting from noisy QAT–style training and Bayesian-inspired scaling ideas, applied on this fork’s mixed-precision `train_gpt.py` path under the Parameter Golf rules (16MB artifact, FineWeb val, and so on).
 
-**What is on this branch:** the shared fork tree and candidate training stack inherited from the **`qat-int4-int6-gps-mlp`** lineage (same repo, different branches carry different experiments).
+**Where the detail lives:** hypothesis, current code status, and intended next steps are in [`architecture_notes/branch_notes/noisy-qat-bayesian.md`](architecture_notes/branch_notes/noisy-qat-bayesian.md).
 
-## Core engineering (fork baseline vs other branches)
-
-The **default candidate stack** on branch **`qat-int4-int6-gps-mlp`** (and inherited files on this branch until diverging commits) centers on:
-
-- **Int6 GPS (General Purpose Slots/Attention)**: 6-bit QAT-style treatment for attention projections.
-- **Int4 MLP**: aggressive 4-bit-style compression on feedforward blocks.
-- **Dynamic per-block scaling**: normalization across weight blocks for stable low-bit export.
-
-**Eval-time line (different branch):** **`BayesianBackoffCache`** and optional **`TestTimeAdapter`** are on **`qat-int4-int6-gps-mlp-tt-adapter`**.
+**How we run it:** use the **Colab runbooks** for cheap staging gates; use **Runpod** (or similar) when you want full-GPU confirmation. This README stays high level; comparisons across setups belong there.
 
 ## Participant Form
 
@@ -42,9 +34,9 @@ The challenge runs from March 18th to April 30th.
 
 Happy training!
 
-## Leaderboard (Parameter Golf challenge — not branch-specific)
+## Leaderboard
 
-The table below is the **official challenge leaderboard** shipped with this fork’s `records/` tree. Rows are **individual submissions**, not “what `noisy-qat-bayesian` implements.” For what *this* branch is for, see [the branch note](architecture_notes/branch_notes/noisy-qat-bayesian.md).
+Official Parameter Golf results; each row is a submission under `records/`.
 
 | Run | Score | Author | Summary | Date | Info |
 |-----|------:|--------|---------|------|------|
@@ -68,19 +60,6 @@ The table below is the **official challenge leaderboard** shipped with this fork
 | Run | Score | Author | Summary | Date | Info |
 |-----|------:|--------|---------|------|------|
 | 4-Hour Baseline | 1.2074 | Will DePue | Testing unlimited compute, 4 hours on 8xH100 | 2026-03-18 | [info](records/track_non_record_16mb/2026-03-18_Quasi10Bfrom50B_SP1024_9x512_KV4_4h_pgut3/README.md) |
-
-## Other experiment branches (separate checkouts)
-
-Each bullet is a **different Git branch** in [this repository](https://github.com/jmoncayo-pursuit/parameter-golf-qat-int4/branches). Checking out **`noisy-qat-bayesian`** does **not** give you the code from the other branches unless you merge or switch branches.
-
-| Branch | What it is | Note |
-|:---|:---|:---|
-| **`qat-int4-int6-gps-mlp`** | Default int4/int6 GPS candidate stack | [`qat-int4-int6-gps-mlp-baseline.md`](architecture_notes/branch_notes/qat-int4-int6-gps-mlp-baseline.md) |
-| **`qat-int4-int6-gps-mlp-tt-adapter`** | Eval-time **`BayesianBackoffCache`** + optional **`TestTimeAdapter`** | [`qat-int4-int6-gps-mlp-tt-adapter.md`](architecture_notes/branch_notes/qat-int4-int6-gps-mlp-tt-adapter.md) |
-| **`noisy-qat-bayesian`** | Training-side noisy QAT / Bayesian-inspired quantization line (**this** branch) | [`noisy-qat-bayesian.md`](architecture_notes/branch_notes/noisy-qat-bayesian.md) |
-| **`research/turboquant-probe`** | Static-weight TurboQuant feasibility | [`research-turboquant-probe.md`](architecture_notes/branch_notes/research-turboquant-probe.md) where present; also [turboquant-mse-probe](https://github.com/jmoncayo-pursuit/turboquant-mse-probe) |
-
-All branch notes live under **`architecture_notes/branch_notes/`**.
 
 ## Getting Started
 
