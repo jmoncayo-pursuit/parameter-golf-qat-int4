@@ -769,7 +769,7 @@ class BayesianBackoffCache:
     Backward-looking variable-order n-gram cache for eval-time mixing (no artifact change).
     Accumulates statistics from already-graded tokens during sliding window evaluation.
     Part of the BayesianBackoffCache_TTAdapter experimental line; pairs with optional
-    TestTimeAdapter (T3) on branch BayesianBackoffCache_TTAdapter — see architecture_notes.
+    TestTimeAdapter (T3) — see architecture_notes. Uses only graded tokens per README eval rules.
     """
     def __init__(self, vocab_size: int, max_order: int = 5, recency_decay: float = 0.999,
                  min_cache_count: float = 0.1, entropy_threshold: float = 0.2,
@@ -846,6 +846,34 @@ class BayesianBackoffCache:
             if p in self._token_history:
                 ctx.append(self._token_history[p])
         return ctx
+
+
+class TestTimeAdapter(nn.Module):
+    """
+    Evaluation-time gradient-based adaptation (T3).
+    Zero-initialized at runtime; no training data persistent in 16MB artifact.
+    """
+    def __init__(self, vocab_size: int, buckets: int = 4096):
+        super().__init__()
+        self.vocab_size = vocab_size
+        self.buckets = buckets
+        # Initialize bias to zero; we learn it during eval
+        self.bigram_bias = nn.Embedding(buckets, vocab_size)
+        nn.init.zeros_(self.bigram_bias.weight)
+
+    def get_hash(self, tokens: Tensor) -> Tensor:
+        # tokens: (B, T)
+        t_m1 = tokens[:, :-1]
+        t_0 = tokens[:, 1:]
+        # Simple bigram hash matching the model's architecture
+        h = (t_m1 * 31337 + t_0) % self.buckets
+        # Pad with 0 for the first token in the sequence (no bigram)
+        return torch.cat([torch.zeros((tokens.size(0), 1), dtype=torch.long, device=tokens.device), h], dim=1)
+
+    def forward(self, tokens: Tensor) -> Tensor:
+        # tokens: (B, T)
+        h = self.get_hash(tokens)
+        return self.bigram_bias(h) # (B, T, vocab_size)
 
 
 def eval_val_sliding(
@@ -939,11 +967,14 @@ def eval_val_sliding_cached(
     batch_seqs: int = 32,
 ) -> tuple[float, float]:
     """
-    Sliding eval with BayesianBackoffCache: mix model logits with cache when thresholds pass.
-    Uses only already-graded tokens for cache stats. Extended line adds TestTimeAdapter (T3)
-    on branch BayesianBackoffCache_TTAdapter — see architecture_notes/branch_notes/.
+    Sliding eval: BayesianBackoffCache mixes model logits when thresholds pass; optional
+    TestTimeAdapter (T3) adds zero-init bigram bias updated online on graded tokens only.
+    See architecture_notes/branch_notes/BayesianBackoffCache_TTAdapter.md.
     """
     cache = BayesianBackoffCache(vocab_size=args.vocab_size)
+    adapter = TestTimeAdapter(args.vocab_size).to(device)
+    t3_optimizer = torch.optim.AdamW(adapter.parameters(), lr=4e-4, weight_decay=0.01)
+
     seq_len = args.train_seq_len
     total_tokens = val_tokens.numel() - 1
     window_starts = [ws for ws in range(0, total_tokens, stride)
@@ -958,68 +989,77 @@ def eval_val_sliding_cached(
     byte_count = torch.zeros((), device=device, dtype=torch.float64)
 
     base_model.eval()
-    with torch.inference_mode():
-        for bi in range(0, len(my_windows), batch_seqs):
-            batch_ws = my_windows[bi:bi + batch_seqs]
-            bsz = len(batch_ws)
-            x_batch = torch.zeros(bsz, seq_len, dtype=torch.int64, device=device)
-            y_batch = torch.zeros(bsz, seq_len, dtype=torch.int64, device=device)
-            wlens: list[int] = []
-            for i, ws in enumerate(batch_ws):
-                end = min(ws + seq_len, total_tokens)
-                wlen = end - ws
-                wlens.append(wlen)
-                chunk = val_tokens[ws:end + 1].to(dtype=torch.int64, device=device)
-                x_batch[i, :wlen] = chunk[:-1]
-                y_batch[i, :wlen] = chunk[1:]
-            
+    # No full inference_mode: T3 updates adapter parameters during eval.
+    t3_step_interval = 1024  # tokens between periodic AdamW steps on the adapter
+    for bi in range(0, len(my_windows), batch_seqs):
+        batch_ws = my_windows[bi:bi + batch_seqs]
+        bsz = len(batch_ws)
+        x_batch = torch.empty(bsz, seq_len, dtype=torch.int64, device=device)
+        y_batch = torch.empty(bsz, seq_len, dtype=torch.int64, device=device)
+        wlens: list[int] = []
+        for i, ws in enumerate(batch_ws):
+            end = min(ws + seq_len, total_tokens)
+            wlen = end - ws
+            wlens.append(wlen)
+            chunk = val_tokens[ws:end + 1].to(dtype=torch.int64, device=device)
+            x_batch[i, :wlen] = chunk[:-1]
+            y_batch[i, :wlen] = chunk[1:]
+
+        with torch.no_grad():
             with torch.autocast(device_type=device.type, dtype=torch.bfloat16):
-                logits = base_model.forward_logits(x_batch)
+                base_logits = base_model.forward_logits(x_batch)
 
-            # Scoring loop with cache integration
-            for i, ws in enumerate(batch_ws):
-                wlen = wlens[i]
-                s = 0 if ws == 0 else max(wlen - stride, 0)
-                
-                # Update cache based on global_position for all tokens SEEN so far in this sequence
-                # Since windows are sliding, we only observe tokens when they are in the 'past' of the next stride
-                # For simplicity, we observe all tokens as they become finalized
-                
-                for j in range(wlen):
-                    # Cache observation is backward-looking: at j, cache knows [0...j-1]
-                    # The predictor uses cache.mix_with_model()
-                    if j < s:
-                        # Just update history/cache, no scoring
-                        cache.observe(y_batch[i, j].item(), global_position=ws + j)
-                        continue
-                    
-                    # Prediction at j using tokens [0...j-1]
-                    target_id = y_batch[i, j].item()
-                    model_lp = F.log_softmax(logits[i, j].float(), dim=0)
-                    
-                    # Target-independent mixing
-                    ctx = cache.get_context_at(ws + j) # History so far
-                    mixed_lp = cache.mix_with_model(model_lp, ctx)
-                    
-                    mixed_nll_j = -mixed_lp[target_id].item()
-                    loss_sum += mixed_nll_j
-                    token_count += 1
-                    
-                    # Byte counting
-                    tgt = y_batch[i, j]
-                    prev = x_batch[i, j]
-                    tb = base_bytes_lut[tgt].to(torch.float64)
-                    tb += (has_leading_space_lut[tgt] & ~is_boundary_token_lut[prev]).to(torch.float64)
-                    byte_count += tb.item()
-                    
-                    # Update cache for the NEXT token's prediction
-                    cache.observe(target_id, global_position=ws + j)
+        for i, ws in enumerate(batch_ws):
+            wlen = wlens[i]
+            s = 0 if ws == 0 else max(wlen - stride, 0)
 
-            if rank == 0 and (bi // batch_seqs) % 10 == 0:
-                done = min(bi + batch_seqs, len(my_windows))
-                pct = done / len(my_windows) * 100
-                running_bpb = (loss_sum / token_count).item() / math.log(2.0) * (token_count.item() / byte_count.item())
-                print(f"  cached_sliding_eval [{pct:5.1f}%] {done}/{len(my_windows)} windows running_bpb={running_bpb:.6f}", flush=True)
+            for j in range(wlen):
+                if j < s:
+                    cache.observe(y_batch[i, j].item(), global_position=ws + j)
+                    continue
+
+                target_id = y_batch[i, j].item()
+                with torch.no_grad():
+                    m_logits = base_logits[i, j].float()
+
+                a_bias = adapter.forward(x_batch[i, j:j + 1].unsqueeze(0)).squeeze()
+                pred_lp = F.log_softmax(m_logits + a_bias, dim=0)
+                ctx = cache.get_context_at(ws + j)
+                mixed_lp = cache.mix_with_model(pred_lp, ctx)
+
+                mixed_nll_j = -mixed_lp[target_id].item()
+                loss_sum += mixed_nll_j
+                token_count += 1
+
+                tgt, prev = y_batch[i, j], x_batch[i, j]
+                tb = base_bytes_lut[tgt].to(torch.float64)
+                tb += (has_leading_space_lut[tgt] & ~is_boundary_token_lut[prev]).to(torch.float64)
+                byte_count += tb.item()
+
+                cache.observe(target_id, global_position=ws + j)
+
+                if (token_count.item() % t3_step_interval) == 0:
+                    t3_optimizer.zero_grad()
+                    a_logits = adapter.forward(x_batch[i, j:j + 1].unsqueeze(0)).squeeze()
+                    t3_loss = F.cross_entropy(
+                        (m_logits + a_logits).unsqueeze(0),
+                        torch.tensor([target_id], device=device),
+                    )
+                    t3_loss.backward()
+                    t3_optimizer.step()
+
+        if rank == 0 and (bi // batch_seqs) % 10 == 0:
+            done = min(bi + batch_seqs, len(my_windows))
+            pct = done / len(my_windows) * 100
+            running_bpb = (
+                (loss_sum / token_count).item() / math.log(2.0) * (token_count.item() / byte_count.item())
+                if token_count.item() > 0
+                else 0.0
+            )
+            print(
+                f"  bb_cache_tt_adapter_eval [{pct:5.1f}%] {done}/{len(my_windows)} windows running_bpb={running_bpb:.6f}",
+                flush=True,
+            )
 
     if dist.is_available() and dist.is_initialized():
         dist.all_reduce(loss_sum, op=dist.ReduceOp.SUM)
