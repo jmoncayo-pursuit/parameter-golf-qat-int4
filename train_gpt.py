@@ -769,7 +769,7 @@ class BayesianBackoffCache:
     Backward-looking variable-order n-gram cache for eval-time mixing (no artifact change).
     Accumulates statistics from already-graded tokens during sliding window evaluation.
     Candidate branch `qat-int4-int6-gps-mlp`; optional TestTimeAdapter (T3) on branch
-    `qat-int4-int6-gps-mlp-tt-adapter` — see architecture_notes.
+    `qat-int4-int6-gps-mlp-tt-adapter` — see architecture_notes/branch_notes/qat-int4-int6-gps-mlp-tt-adapter.md.
     """
     def __init__(self, vocab_size: int, max_order: int = 5, recency_decay: float = 0.999,
                  min_cache_count: float = 0.1, entropy_threshold: float = 0.2,
