@@ -1,0 +1,20 @@
+# Controllable guardrail: Cursor/agent config stays machine-local.
+name: Repo hygiene
+on:
+  push:
+  pull_request:
+
+jobs:
+  no-tracked-cursor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if .cursor/ is tracked
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -q '^\.cursor/'; then
+            echo "::error::Tracked files under .cursor/ are not allowed. Keep .cursor/ in .gitignore and use local-only rules."
+            git ls-files | grep '^\.cursor/' || true
+            exit 1
+          fi
+          echo "OK: no tracked .cursor/"
