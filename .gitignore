@@ -1,3 +1,6 @@
+# Cursor — keep local only (never push)
+.cursor/
+
 data/tokenizers
 __pycache__/
 .DS_Store
