@@ -216,6 +216,10 @@ def eval_val(
     val_loss = val_loss_sum / val_token_count
     bits_per_token = val_loss.item() / math.log(2.0)
     tokens_per_byte = val_token_count.item() / val_byte_count.item()
+    if os.environ.get('CHECKPOINT_ONLY') == '1':
+        torch.save(model.state_dict(), 'final_model.pt')
+        print('CHECKPOINT_ONLY: Saved and exiting.')
+        import sys; sys.exit(0)
     model.train()
     return float(val_loss.item()), float(bits_per_token * tokens_per_byte)
 
@@ -1042,7 +1046,7 @@ def main() -> None:
 
     code = Path(__file__).read_text(encoding="utf-8")
     args = Hyperparameters()
-    zeropower_via_newtonschulz5 = torch.compile(zeropower_via_newtonschulz5)
+    zeropower_via_newtonschulz5 = zeropower_via_newtonschulz5
 
     distributed = "RANK" in os.environ and "WORLD_SIZE" in os.environ
     rank = int(os.environ.get("RANK", "0"))
@@ -1148,7 +1152,7 @@ def main() -> None:
         if isinstance(module, CastedLinear):
             module.float()
     restore_low_dim_params_to_fp32(base_model)
-    compiled_model = torch.compile(base_model, dynamic=False, fullgraph=True)
+    compiled_model = base_model
     model: nn.Module = DDP(compiled_model, device_ids=[local_rank], broadcast_buffers=False) if distributed else compiled_model
 
     block_named_params = list(base_model.blocks.named_parameters())
@@ -1244,6 +1248,10 @@ def main() -> None:
     if args.warmup_steps > 0:
         initial_model_state = {name: tensor.detach().cpu().clone() for name, tensor in base_model.state_dict().items()}
         initial_optimizer_states = [copy.deepcopy(opt.state_dict()) for opt in optimizers]
+        if os.environ.get('CHECKPOINT_ONLY') == '1':
+            torch.save(model.state_dict(), 'final_model.pt')
+            print('CHECKPOINT_ONLY: Saved and exiting.')
+            import sys; sys.exit(0)
         model.train()
         for warmup_step in range(args.warmup_steps):
             zero_grad_all()
