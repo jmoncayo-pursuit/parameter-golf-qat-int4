@@ -998,8 +998,8 @@ def eval_val_sliding_cached(
     for bi in range(0, len(my_windows), batch_seqs):
         batch_ws = my_windows[bi:bi + batch_seqs]
         bsz = len(batch_ws)
-        x_batch = torch.empty(bsz, seq_len, dtype=torch.int64, device=device)
-        y_batch = torch.empty(bsz, seq_len, dtype=torch.int64, device=device)
+        x_batch = torch.zeros(bsz, seq_len, dtype=torch.int64, device=device)
+        y_batch = torch.zeros(bsz, seq_len, dtype=torch.int64, device=device)
         wlens: list[int] = []
         for i, ws in enumerate(batch_ws):
             end = min(ws + seq_len, total_tokens)
